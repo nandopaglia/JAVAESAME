@@ -1,1 +1,7 @@
-com/azienda/SistemaGestioneDocumentale.class
+com/azienda/model/User.class
+com/azienda/model/Document.class
+com/azienda/manager/UserManager.class
+com/azienda/utils/LogConfig.class
+com/azienda/Main.class
+com/azienda/manager/DocumentManager.class
+com/azienda/utils/DBConnection.class

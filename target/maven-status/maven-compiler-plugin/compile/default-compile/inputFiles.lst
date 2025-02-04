@@ -1,4 +1,7 @@
-/home/info/gestione-documentale/src/main/java/com/azienda/SistemaGestioneDocumentale.java
-/home/info/gestione-documentale/src/main/java/com/azienda/Documento.java
-/home/info/gestione-documentale/src/main/java/com/azienda/App.java
-/home/info/gestione-documentale/src/main/java/com/azienda/GestoreDocumenti.java
+/home/info/ESAME/JAVAESAME/src/main/java/com/azienda/manager/UserManager.java
+/home/info/ESAME/JAVAESAME/src/main/java/com/azienda/model/Document.java
+/home/info/ESAME/JAVAESAME/src/main/java/com/azienda/Main.java
+/home/info/ESAME/JAVAESAME/src/main/java/com/azienda/manager/DocumentManager.java
+/home/info/ESAME/JAVAESAME/src/main/java/com/azienda/utils/LogConfig.java
+/home/info/ESAME/JAVAESAME/src/main/java/com/azienda/model/User.java
+/home/info/ESAME/JAVAESAME/src/main/java/com/azienda/utils/DBConnection.java
