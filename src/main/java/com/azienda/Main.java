@@ -4,8 +4,8 @@ import com.azienda.utils.LogConfig;
 import com.azienda.utils.DBConnection;
 import com.azienda.manager.UserManager;
 import com.azienda.manager.DocumentManager;
-import com.azienda.model.Document;      // import per la classe Document
-import java.util.List;                 // import per l'interfaccia List
+import com.azienda.model.User;        // <--- Importa la classe User
+import com.azienda.model.Document;   // <--- Importa Document
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.List;               // <--- Import List
 import java.util.Scanner;
 
 public class Main {
@@ -32,7 +33,7 @@ public class Main {
         while (!exit) {
             System.out.println("\n===== MENU PRINCIPALE =====");
             System.out.println("1. Login");
-            System.out.println("2. Gestione Documenti (in arrivo)");
+            System.out.println("2. Gestione Documenti");
             System.out.println("0. Esci");
             System.out.print("Scelta: ");
 
@@ -40,16 +41,69 @@ public class Main {
 
             switch (choice) {
                 case "1":
-                    // TODO: implementa login e gestione utenti
+                    // Login e (eventuale) menu admin
                     System.out.print("Username: ");
-                    String user = scanner.nextLine();
+                    String username = scanner.nextLine();
                     System.out.print("Password: ");
-                    String pass = scanner.nextLine();
+                    String password = scanner.nextLine();
 
                     UserManager um = new UserManager();
-                    if (um.checkCredentials(user, pass)) {
-                        System.out.println("Login OK!");
-                        // Qui potresti gestire "se ruolo = ADMIN" allora mostra un menu admin, ecc.
+                    User loggedUser = um.login(username, password);
+
+                    if (loggedUser != null) {
+                        System.out.println("Login OK! Ruolo: " + loggedUser.getRole());
+
+                        if ("ADMIN".equalsIgnoreCase(loggedUser.getRole())) {
+                            // Sottomenù gestione utenti
+                            boolean backAdmin = false;
+                            while (!backAdmin) {
+                                System.out.println("\n=== GESTIONE UTENTI (ADMIN) ===");
+                                System.out.println("1. Crea nuovo utente");
+                                System.out.println("2. Elenca tutti gli utenti");
+                                System.out.println("0. Torna al menu principale");
+                                System.out.print("Scelta: ");
+                                String adminChoice = scanner.nextLine();
+
+                                switch (adminChoice) {
+                                    case "1":
+                                        // Creazione nuovo utente
+                                        System.out.print("Nuovo username: ");
+                                        String newU = scanner.nextLine();
+                                        System.out.print("Nuova password: ");
+                                        String newP = scanner.nextLine();
+                                        System.out.print("Ruolo (ADMIN/USER): ");
+                                        String newR = scanner.nextLine();
+                                        um.createUser(newU, newP, newR);
+                                        System.out.println("Utente creato!");
+                                        break;
+
+                                    case "2":
+                                        // Elenco utenti
+                                        List<User> userList = um.listUsers(); 
+                                        // ^-- Assicurati che listUsers() esista in UserManager
+                                        System.out.println("=== LISTA UTENTI ===");
+                                        for (User u : userList) {
+                                            System.out.println(
+                                                "ID=" + u.getId()
+                                                + " User=" + u.getUsername()
+                                                + " Role=" + u.getRole()
+                                            );
+                                        }
+                                        break;
+
+                                    case "0":
+                                        backAdmin = true;
+                                        break;
+
+                                    default:
+                                        System.out.println("Scelta non valida in gestione utenti (ADMIN).");
+                                }
+                            }
+                        } else {
+                            System.out.println("Benvenuto, utente NON admin.");
+                            // Se vuoi, altre funzioni per EMPLOYEE...
+                        }
+
                     } else {
                         System.out.println("Credenziali errate.");
                     }
@@ -62,6 +116,7 @@ public class Main {
                         System.out.println("\n=== GESTIONE DOCUMENTI ===");
                         System.out.println("1. Crea nuovo documento");
                         System.out.println("2. Elenca documenti");
+                        System.out.println("3. Cerca documenti");
                         System.out.println("0. Torna al menu principale");
                         System.out.print("Scelta: ");
                         String docChoice = scanner.nextLine();
@@ -83,8 +138,20 @@ public class Main {
                                 System.out.println("=== ELENCO DOCUMENTI ===");
                                 List<Document> docs = dm.listDocuments();
                                 for (Document d : docs) {
-                                    System.out.println("ID=" + d.getId() + ", Titolo=" + d.getTitle()
-                                            + ", Data=" + d.getCreatedDate());
+                                    System.out.println("ID=" + d.getId()
+                                        + ", Titolo=" + d.getTitle()
+                                        + ", Data=" + d.getCreatedDate());
+                                }
+                                break;
+
+                            case "3":
+                                System.out.print("Inserisci parola chiave: ");
+                                String keyword = scanner.nextLine();
+                                List<Document> foundDocs = dm.searchDocuments(keyword);
+                                System.out.println("=== RISULTATI RICERCA ===");
+                                for (Document d : foundDocs) {
+                                    System.out.println("ID=" + d.getId()
+                                        + ", Titolo=" + d.getTitle());
                                 }
                                 break;
 

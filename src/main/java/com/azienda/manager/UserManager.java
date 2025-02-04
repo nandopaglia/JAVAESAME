@@ -13,10 +13,10 @@ public class UserManager {
     private static final Logger logger = Logger.getLogger(UserManager.class);
 
     /**
-     * Verifica se esiste un utente con le credenziali specificate
-     * Restituisce true se le credenziali sono valide, false altrimenti.
+     * Tenta il login con username e password.
+     * Restituisce un User (che contiene anche role) se valido, altrimenti null.
      */
-    public boolean checkCredentials(String username, String password) {
+    public User login(String username, String password) {
         String sql = "SELECT * FROM users WHERE username=? AND password=?";
 
         try (Connection conn = DBConnection.getConnection();
@@ -26,13 +26,21 @@ public class UserManager {
             ps.setString(2, password);
 
             try (ResultSet rs = ps.executeQuery()) {
-                return rs.next(); // true se trova almeno una riga
+                if (rs.next()) {
+                    // Creiamo l'oggetto User con i campi dal DB
+                    return new User(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        rs.getString("role")
+                    );
+                }
             }
 
         } catch (SQLException e) {
-            logger.error("Errore in checkCredentials", e);
-            return false;
+            logger.error("Errore in login()", e);
         }
+        return null; // se non trovato
     }
 
     /**
@@ -57,7 +65,7 @@ public class UserManager {
     }
 
     /**
-     * Restituisce l'elenco di tutti gli utenti
+     * Restituisce l'elenco di tutti gli utenti nel DB.
      */
     public List<User> listUsers() {
         List<User> result = new ArrayList<>();
@@ -77,7 +85,7 @@ public class UserManager {
                 result.add(u);
             }
         } catch (SQLException e) {
-            logger.error("Errore in listUsers", e);
+            logger.error("Errore in listUsers()", e);
         }
         return result;
     }
